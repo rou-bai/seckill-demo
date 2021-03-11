@@ -3,6 +3,7 @@ package com.xxxx.seckill.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sun.istack.internal.NotNull;
+import com.xxxx.seckill.exception.GlobalException;
 import com.xxxx.seckill.mapper.UserMapper;
 import com.xxxx.seckill.pojo.User;
 import com.xxxx.seckill.service.IUserService;
@@ -45,11 +46,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         //根据手机号获取用户
         User user = userMapper.selectById(mobile);
         if(user == null){
-            return RespBean.error(RespBeanEnum.LOGIN_ERROR);
+            throw new GlobalException(RespBeanEnum.LOGIN_ERROR);
         }
         //检查密码是否正确
         if(!MD5Util.formPassToDBPass(password, user.getSalt()).equals(user.getPassword())){
-            return RespBean.error(RespBeanEnum.LOGIN_ERROR);
+            throw new GlobalException(RespBeanEnum.LOGIN_ERROR);
         }
         return RespBean.success();
     }
