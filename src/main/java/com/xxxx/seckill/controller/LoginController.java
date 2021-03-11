@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Controller
 @RequestMapping("/login")
 @Slf4j
@@ -23,7 +25,7 @@ public class LoginController {
     //登陆功能
     @PostMapping("/doLogin")
     @ResponseBody
-    public RespBean doLogin(LoginVo loginVo){
+    public RespBean doLogin(@Valid LoginVo loginVo){
 //        log.info("{}", loginVo);  打印传入参数
         return UserService.doLogin(loginVo);
     }
