@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -43,12 +45,12 @@ public class SeckillGoods implements Serializable {
     /**
      * 秒杀开始时间
      */
-    private LocalDateTime startDate;
+    private Date startDate;
 
     /**
      * 秒杀结束时间
      */
-    private LocalDateTime endDate;
+    private Date endDate;
 
     /**
      * 商品ID

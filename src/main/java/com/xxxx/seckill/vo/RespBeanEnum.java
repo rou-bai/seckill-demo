@@ -17,7 +17,11 @@ public enum RespBeanEnum {
     //登陆模块
     LOGIN_ERROR(500210, "用户名或者密码错误"),
     MOBILE_ERROR(500211, "手机号码格式不正确"),
-     BIND_ERROR(500212, "参数校验异常");
+     BIND_ERROR(500212, "参数校验异常"),
+    //秒杀模块
+    EMPTY_STOCK(500500, "库存不足"),
+    REPETE_STOCK(500501, "该商品每人限购一件"),
+    GOODS_NOT_EXISTS(500502, "商品不存在");
     private final Integer code;
     private final String message;
 }
