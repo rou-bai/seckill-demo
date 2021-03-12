@@ -14,7 +14,7 @@ import java.util.List;
 mvc配置类
  */
 @Configuration
-//@EnableWebMvc  这个打开会引起静态资源加载失败
+@EnableWebMvc  //这个打开会引起静态资源加载失败
 public class WebCofig implements WebMvcConfigurer {
     @Autowired
     private UserArgumentResolver userArgumentResolver;
@@ -22,5 +22,11 @@ public class WebCofig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolverList){
         resolverList.add(userArgumentResolver);
+    }
+
+        //这里配置静态资源文件的路径导包都是默认的直接导入, 因为加了注解@EnableWebMvc
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
     }
 }
