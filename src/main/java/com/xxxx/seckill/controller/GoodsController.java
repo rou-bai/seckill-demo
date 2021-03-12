@@ -24,16 +24,15 @@ public class GoodsController {
     @Autowired
     private IUserService userService;
     @GetMapping("/toList")
-    public String toList(Model model, @CookieValue("userTicket") String ticket,
-                         HttpServletRequest request, HttpServletResponse response){
-        if(StringUtils.isBlank(ticket)){
-            return "login";
-        }
+    public String toList(Model model, User user){
+//        if(StringUtils.isBlank(ticket)){
+//            return "login";
+//        }
 //        User user = (User)session.getAttribute("ticket");
-        User user = userService.getUserByCookie(ticket, request, response);
-        if(null == user){
-            return "login";
-        }
+//        User user = userService.getUserByCookie(ticket, request, response);
+//        if(null == user){
+//            return "login";
+//        }
         model.addAttribute("user", user);
         return "goods_list";
     }
