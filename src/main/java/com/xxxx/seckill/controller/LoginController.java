@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @Controller
@@ -25,8 +27,10 @@ public class LoginController {
     //登陆功能
     @PostMapping("/doLogin")
     @ResponseBody
-    public RespBean doLogin(@Valid LoginVo loginVo){
+    public RespBean doLogin(@Valid LoginVo loginVo,
+                            HttpServletRequest request,
+                            HttpServletResponse response){
 //        log.info("{}", loginVo);  打印传入参数
-        return UserService.doLogin(loginVo);
+        return UserService.doLogin(loginVo, request, response);
     }
 }

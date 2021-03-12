@@ -8,6 +8,9 @@ import com.xxxx.seckill.vo.LoginVo;
 import com.xxxx.seckill.vo.RespBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * <p>
  *  服务类
@@ -17,5 +20,5 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @since 2021-03-11
  */
 public interface IUserService extends IService<User> {
-    RespBean doLogin(LoginVo loginVo);
+    RespBean doLogin(LoginVo loginVo, HttpServletRequest request, HttpServletResponse response);
 }
