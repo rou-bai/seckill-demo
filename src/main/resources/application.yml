@@ -42,6 +42,30 @@ spring:
    logging:
      level:
        com.xxxx.seckill.mapper:debug
+
 server:
   port: 8888
+
+#redis配置
+redis:
+  #服务器地址
+  host: 192.168.1.4
+  #端口
+  port: 6379
+  #数据库，redis默认有16个数据库
+  database: 0
+  #超时时间
+  timeout: 10000ms
+  lettuce:
+    #连接池
+    pool:
+      #最大连接数，默认8
+      max-active: 8
+      #最大连接阻塞等待时间，默认-1
+      max-wait: 10000ms
+      #最大空闲连接，默认8
+      max-idle: 200
+      #最小空闲连接，默认0
+      min-idle: 5
+
 
