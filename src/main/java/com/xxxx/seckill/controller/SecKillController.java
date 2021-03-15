@@ -8,8 +8,6 @@ import com.xxxx.seckill.service.IGoodsService;
 import com.xxxx.seckill.service.IOrderService;
 import com.xxxx.seckill.service.ISeckillOrderService;
 import com.xxxx.seckill.service.IUserService;
-import com.xxxx.seckill.service.impl.GoodsServiceImpl;
-import com.xxxx.seckill.service.impl.UserServiceImpl;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +31,7 @@ public class SecKillController {
 
     /*
     秒杀
+    优化前： 1000 * 10  吞吐量QPS:2876
      */
 
     @RequestMapping("/doSecKill")
