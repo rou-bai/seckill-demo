@@ -12,6 +12,7 @@ import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,13 @@ public class SecKillController {
     private IOrderService orderService;
     @Autowired
     private IGoodsService goodsService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /*
     秒杀
     优化前： 1000 * 10  吞吐量QPS:2876
+    缓存QPS：1458
      */
 
     @RequestMapping("/doSecKill2")
@@ -52,8 +56,7 @@ public class SecKillController {
         }
 
         //判断是否重复抢购
-        SeckillOrder seckillOrder =
-                seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
+        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
                 user.getId()).eq("goods_id", goodsId));
         if(seckillOrder != null){
             model.addAttribute("errmsg", RespBeanEnum.REPETE_STOCK.getMessage());
@@ -82,10 +85,12 @@ public class SecKillController {
             return RespBean.error(RespBeanEnum.REPETE_STOCK);
         }
 
-        //判断是否重复抢购
-        SeckillOrder seckillOrder =
-                seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
-                        user.getId()).eq("goods_id", goodsId));
+        //判断是否重复抢购, 更改为通过redis去取，由uid+goodsid确定同一用户不能抢购两单
+        SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + goods.getId());
+//        SeckillOrder seckillOrder =
+//                seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
+//                        user.getId()).eq("goods_id", goodsId));
+
         if(seckillOrder != null){
             return RespBean.error(RespBeanEnum.REPETE_STOCK);
         }
