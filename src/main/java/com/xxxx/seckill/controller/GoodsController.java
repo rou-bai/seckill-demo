@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.xxxx.seckill.pojo.User;
 import com.xxxx.seckill.service.IGoodsService;
 import com.xxxx.seckill.service.IUserService;
-import com.xxxx.seckill.vo.DetailVo;
+import com.xxxx.seckill.vo.GoodsDetailVo;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +146,7 @@ public class GoodsController {
         }
 
         //构造object
-        DetailVo detailVo = new DetailVo();
+        GoodsDetailVo detailVo = new GoodsDetailVo();
         detailVo.setGoodsVo(goodsVo);
         detailVo.setUser(user);
         detailVo.setRemainSeconds(remainSeconds);

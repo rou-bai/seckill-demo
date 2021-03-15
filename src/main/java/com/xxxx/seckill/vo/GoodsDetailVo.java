@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DetailVo {
+public class GoodsDetailVo {
     private User user;
     private GoodsVo goodsVo;
     private int secKillStatus;

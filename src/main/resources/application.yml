@@ -43,7 +43,7 @@ spring:
      level:
        com.xxxx.seckill.mapper:debug
 
-  web:
+ web:
     #静态资源处理
     resources:
       #启用默认静态资源处理，默认启用
