@@ -9,13 +9,12 @@ import com.xxxx.seckill.service.IOrderService;
 import com.xxxx.seckill.service.ISeckillOrderService;
 import com.xxxx.seckill.service.IUserService;
 import com.xxxx.seckill.vo.GoodsVo;
+import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/seckill")
@@ -34,8 +33,8 @@ public class SecKillController {
     优化前： 1000 * 10  吞吐量QPS:2876
      */
 
-    @RequestMapping("/doSecKill")
-    public String doSecKill(Model model, User user, @RequestParam("goodsId") long goodsId){
+    @RequestMapping("/doSecKill2")
+    public String doSecKill2(Model model, User user, @RequestParam("goodsId") long goodsId){
         if(null == user){
             return "login";
         }
@@ -65,6 +64,34 @@ public class SecKillController {
         model.addAttribute("order", order);
         model.addAttribute("goods", goods);
         return "order_detail";
+    }
+
+    @RequestMapping(value = "/doSecKill", method = RequestMethod.POST)
+    @ResponseBody
+    public RespBean doSecKill(User user, @RequestParam("goodsId") long goodsId){
+        if(null == user){
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        GoodsVo goods = goodsService.findGoodsVoById(goodsId);
+        if(goods == null){
+            //商品不存在
+            return RespBean.error(RespBeanEnum.GOODS_NOT_EXISTS);
+        }else if(goods.getStockCount() < 1){
+            //商品库存不足
+            return RespBean.error(RespBeanEnum.REPETE_STOCK);
+        }
+
+        //判断是否重复抢购
+        SeckillOrder seckillOrder =
+                seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
+                        user.getId()).eq("goods_id", goodsId));
+        if(seckillOrder != null){
+            return RespBean.error(RespBeanEnum.REPETE_STOCK);
+        }
+
+        Order order = orderService.seckill(user, goods);
+        return RespBean.success(order);
     }
 
 }
