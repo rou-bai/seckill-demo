@@ -17,6 +17,7 @@ import java.util.Date;
 
 /*
 商品
+优化前： 1000 * 10  吞吐量QPS:2077
  */
 @Controller
 @RequestMapping("/goods")

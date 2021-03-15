@@ -1,5 +1,6 @@
 package com.xxxx.seckill.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xxxx.seckill.pojo.User;
 
 import java.io.ByteArrayOutputStream;
@@ -11,6 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.xxxx.seckill.vo.RespBean;
 
 
 /**
@@ -27,33 +31,32 @@ import com.alibaba.fastjson.JSONObject;
 public class UserUtil {
 
     public static Connection getConn() throws Exception {
-        String url = "jdbc:mysql://192.168.2.113:3306/miaosha?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8";
+        String url = "jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=UTF-8";
         String username = "root";
-        String password = "1234";
+        String password = "ty123456";
         String driver = "com.mysql.cj.jdbc.Driver";
         Class.forName(driver);
         return DriverManager.getConnection(url, username, password);
     }
-
+//
     private static void createUser(int count) throws Exception {
         List<User> users = new ArrayList<User>(count);
-        //生成用户
+//        //生成用户
         for (int i = 0; i < count; i++) {
             User user = new User();
             user.setId(13000000000L + i);
-            user.setLoginCount(1);
-            user.setNickname("user" + i);
-            Date date = new Date();
-            user.setRegisterDate(LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
-            user.setSalt("1a2b3c");
-            user.setPassword(MD5Util.inputPassToDBPass("123456", user.getSalt()));
+//            user.setLoginCount(1);
+//            user.setNickname("user" + i);
+//            user.setRegisterDate(new Date());
+//            user.setSalt("1a2b3c4d");
+//            user.setPassword(MD5Util.inputPassToDBPass("123456", user.getSalt()));
             users.add(user);
         }
         System.out.println("create user");
-//        //插入数据库
+        //插入数据库
 //        Connection conn = getConn();
-//        String sql = "insert into miaosha_user(login_count, nickname, register_date, salt, password, id)values(?,?,?,?,?,?)";
-//        PreparedStatement pstmt = conn.prepareStatement(sql);
+//        String sql = "insert into t_user(login_count, nickname,register_date, salt, password, id) values(?,?,?,?,?,?)";
+//      PreparedStatement pstmt = conn.prepareStatement(sql);
 //        for (int i = 0; i < users.size(); i++) {
 //            User user = users.get(i);
 //            pstmt.setInt(1, user.getLoginCount());
@@ -67,10 +70,10 @@ public class UserUtil {
 //        pstmt.executeBatch();
 //        pstmt.close();
 //        conn.close();
-        System.out.println("insert to db");
+//        System.out.println("insert to db");
         //登录，生成token
-        String urlString = "http://localhost:8080/user/do_login";
-        File file = new File("/Users/guoping/Projects/Intelljidea/seckill/tokens.txt");
+        String urlString = "http://localhost:8888/login/doLogin";
+        File file = new File("/Users/tangyao/Downloads/config.txt");
         if (file.exists()) {
             file.delete();
         }
@@ -97,11 +100,12 @@ public class UserUtil {
             inputStream.close();
             bout.close();
             String response = new String(bout.toByteArray());
-            JSONObject jo = JSON.parseObject(response);
-            String token = jo.getString("data");
-            System.out.println("create token : " + user.getId());
+            ObjectMapper mapper = new ObjectMapper();
+            RespBean respBean = mapper.readValue(response, RespBean.class);
+            String userTicket = (String)respBean.getObj();
+            System.out.println("create userTicket : " + user.getId());
 
-            String row = user.getId() + "," + token;
+            String row = user.getId() + "," + userTicket;
             raf.seek(raf.length());
             raf.write(row.getBytes());
             raf.write("\r\n".getBytes());
@@ -113,6 +117,6 @@ public class UserUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        createUser(5000);
+        createUser(1000);
     }
 }
