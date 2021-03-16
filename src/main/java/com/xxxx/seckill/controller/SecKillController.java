@@ -2,12 +2,15 @@ package com.xxxx.seckill.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xxxx.seckill.pojo.Order;
+import com.xxxx.seckill.pojo.SeckillMessage;
 import com.xxxx.seckill.pojo.SeckillOrder;
 import com.xxxx.seckill.pojo.User;
+import com.xxxx.seckill.rabbitmq.MQSender;
 import com.xxxx.seckill.service.IGoodsService;
 import com.xxxx.seckill.service.IOrderService;
 import com.xxxx.seckill.service.ISeckillOrderService;
 import com.xxxx.seckill.service.IUserService;
+import com.xxxx.seckill.utils.JsonUtil;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
@@ -20,7 +23,9 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/seckill")
@@ -35,6 +40,10 @@ public class SecKillController implements InitializingBean {
     private IGoodsService goodsService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private MQSender mqSender;
+
+    private Map<Long, Boolean> EmptyStockMap = new HashMap<>();
 
     /*
     秒杀
@@ -88,6 +97,11 @@ public class SecKillController implements InitializingBean {
             return RespBean.error(RespBeanEnum.REPETE_STOCK);
         }
 
+        //内存标记，防止redis多余访问
+        if(EmptyStockMap.get(goodsId)){
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
+
         //库存预减
         //decrement:递减，原子型
         Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
@@ -97,9 +111,10 @@ public class SecKillController implements InitializingBean {
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
         }
 
-
-        Order order = orderService.seckill(user, goods);
-        return RespBean.success(order);
+        //rabbitmq发送消息对象
+        SeckillMessage message = new SeckillMessage(user, goodsId);
+        mqSender.sendSeckillMessage(JsonUtil.object2JsonStr(message));
+        return RespBean.success(0);
 
     }
 
@@ -112,7 +127,10 @@ public class SecKillController implements InitializingBean {
         if(CollectionUtils.isEmpty(list)){
             return;
         }
-        list.forEach(goodsVo -> redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(), goodsVo.getStockCount()));
+        list.forEach(goodsVo -> {
+            redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(), goodsVo.getStockCount());
+            EmptyStockMap.put(goodsVo.getId(), false);
+        });
 
     }
 }

@@ -67,6 +67,14 @@ public class MQSender {
         rabbitTemplate.convertAndSend("headersExchange", "", message);
     }
 
+    /*
+    发送秒杀信息
+     */
+    public void sendSeckillMessage(String msg){
+        log.info("秒杀发送消息对象：" + msg);
+        rabbitTemplate.convertAndSend("seckillExchange", "seckill.message", msg);
+    }
+
 
 
 }
