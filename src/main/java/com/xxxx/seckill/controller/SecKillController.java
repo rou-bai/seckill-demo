@@ -1,6 +1,7 @@
 package com.xxxx.seckill.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.xxxx.seckill.pojo.Order;
 import com.xxxx.seckill.pojo.SeckillMessage;
 import com.xxxx.seckill.pojo.SeckillOrder;
@@ -88,11 +89,17 @@ public class SecKillController implements InitializingBean {
         return "order_detail";
     }
 
-    @RequestMapping(value = "/doSecKill", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/doSecKill", method = RequestMethod.POST)
     @ResponseBody
-    public RespBean doSecKill(User user, @RequestParam("goodsId") long goodsId) {
+    public RespBean doSecKill(User user, long goodsId, @PathVariable("path") String path) {
         if (null == user) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        //秒杀地址检查
+        Boolean checkPath = orderService.checkPath(path, user, goodsId);
+        if(!checkPath) {
+            return RespBean.error(RespBeanEnum.SECKILL_PATH_ERROR);
         }
 
         ValueOperations valueOperations = redisTemplate.opsForValue();
@@ -154,5 +161,19 @@ public class SecKillController implements InitializingBean {
 
         Long orderId = seckillOrderService.getResult(user, goodsId);
         return RespBean.success(orderId);
+    }
+
+    /*
+    获取秒杀地址
+     */
+    @RequestMapping(value="/path", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean path(User user, Long goodsId){
+        if(null == user){
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        String path = orderService.createPath(user, goodsId);
+        return RespBean.success(path);
     }
 }

@@ -26,6 +26,7 @@ public enum RespBeanEnum {
     REPETE_STOCK(500501, "该商品每人限购一件"),
     GOODS_NOT_EXISTS(500502, "商品不存在"),
     SECKILL_FAILED(500503, "秒杀失败"),
+    SECKILL_PATH_ERROR(500504, "秒杀路径错误"),
     //订单模块5004x
     ORDER_NOT_EXISTS(500400, "订单不存在");
 

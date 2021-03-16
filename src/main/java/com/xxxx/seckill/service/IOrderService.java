@@ -25,4 +25,14 @@ public interface IOrderService extends IService<Order> {
     获取订单详情
      */
     OrderDetailVo detail(Long orderId);
+
+    /*
+    获取秒杀地址
+     */
+    String createPath(User user, Long goodsId);
+
+    /*
+    秒杀路径确认
+     */
+    Boolean checkPath(String path, User user, long goodsId);
 }
