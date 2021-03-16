@@ -6,12 +6,15 @@ import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+/*
+MQ配置类：fanout广播模式
+ */
 
 @Configuration
-public class RabbitMQConfig {
+public class RabbitMQConfigFanout {
     private static final String FANOUTQUEUE1 = "queue_fanout01";
     private static final String FANOUTQUEUE2 = "queue_fanout02";
-    private static final String FANOUTEXCHANGE = "fanoutExchange";
+    private static final String FANOUTEXCHANGE = "fanoutExchange"; //交换机
 
     @Bean
     public Queue queue(){

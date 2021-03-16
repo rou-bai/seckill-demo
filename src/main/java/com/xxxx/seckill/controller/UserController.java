@@ -38,12 +38,27 @@ public class UserController {
     }
 
     /*
-    测试mq发送接收消息，广播模式
+    测试mq发送接收消息，fanout广播模式
      */
     @RequestMapping("/fanoutMQ")
     @ResponseBody
     public void fanoutMq(){
         mqSender.fanoutSend("广播模式");
+    }
+
+    /*
+    测试mq发送接收消息，direct直连模式
+     */
+    @RequestMapping("/directMQ/queue01")
+    @ResponseBody
+    public void directMQQueue01(){
+        mqSender.directSend01("direct模式:red");
+    }
+
+    @RequestMapping("/directMQ/queue02")
+    @ResponseBody
+    public void directMQQueue02(){
+        mqSender.directSend02("direct模式:green");
     }
 
 }

@@ -25,4 +25,16 @@ public class MQSender {
         rabbitTemplate.convertAndSend("fanoutExchange", "", msg);
     }
 
+    public void directSend01(Object msg){
+        log.info("发送red消息：" + msg);
+        //路由key对应
+        rabbitTemplate.convertAndSend("directExchange", "queue.red", msg);
+    }
+
+    public void directSend02(Object msg){
+        log.info("发送green消息：" + msg);
+        //路由key对应
+        rabbitTemplate.convertAndSend("directExchange", "queue.green", msg);
+    }
+
 }
