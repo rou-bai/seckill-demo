@@ -19,4 +19,10 @@ public class MQSender {
         rabbitTemplate.convertAndSend("queue", msg);
     }
 
+    public void fanoutSend(Object msg){
+        log.info("发送消息：" + msg);
+        //不要路由key
+        rabbitTemplate.convertAndSend("fanoutExchange", "", msg);
+    }
+
 }

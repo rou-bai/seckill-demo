@@ -37,4 +37,13 @@ public class UserController {
         mqSender.send("我好烦");
     }
 
+    /*
+    测试mq发送接收消息，广播模式
+     */
+    @RequestMapping("/fanoutMQ")
+    @ResponseBody
+    public void fanoutMq(){
+        mqSender.fanoutSend("广播模式");
+    }
+
 }
