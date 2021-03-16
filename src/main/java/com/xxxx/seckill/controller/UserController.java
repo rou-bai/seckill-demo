@@ -61,4 +61,16 @@ public class UserController {
         mqSender.directSend02("direct模式:green");
     }
 
+    @RequestMapping("/topicMQ/only")
+    @ResponseBody
+    public void directMQOnly(){
+        mqSender.topicSend01("只有queue01可以接收到的消息");
+    }
+
+    @RequestMapping("/topicMQ/all")
+    @ResponseBody
+    public void directMQAll(){
+        mqSender.topicSend02("大家都可以接收到的消息");
+    }
+
 }
