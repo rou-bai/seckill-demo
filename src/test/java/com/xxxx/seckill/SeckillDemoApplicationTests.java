@@ -55,7 +55,7 @@ class SeckillDemoApplicationTests {
             System.out.println(valueOperations.get("k1"));
 
             //操作结束，删除锁
-            //执行lock.lua脚本
+            //执行lock.lua脚本, lua脚本是原子型的
             Boolean result = (Boolean) redisTemplate.execute(script, Collections.singletonList("k1"), value);
             System.out.println(result);
         }else{
