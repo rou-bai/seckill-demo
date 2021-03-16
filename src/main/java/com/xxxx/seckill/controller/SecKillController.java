@@ -11,15 +11,20 @@ import com.xxxx.seckill.service.IUserService;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/seckill")
-public class SecKillController {
+public class SecKillController implements InitializingBean {
     @Autowired
     private IUserService userService;
     @Autowired
@@ -71,32 +76,43 @@ public class SecKillController {
 
     @RequestMapping(value = "/doSecKill", method = RequestMethod.POST)
     @ResponseBody
-    public RespBean doSecKill(User user, @RequestParam("goodsId") long goodsId){
-        if(null == user){
+    public RespBean doSecKill(User user, @RequestParam("goodsId") long goodsId) {
+        if (null == user) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
 
-        GoodsVo goods = goodsService.findGoodsVoById(goodsId);
-        if(goods == null){
-            //商品不存在
-            return RespBean.error(RespBeanEnum.GOODS_NOT_EXISTS);
-        }else if(goods.getStockCount() < 1){
-            //商品库存不足
-            return RespBean.error(RespBeanEnum.REPETE_STOCK);
-        }
-
+        ValueOperations valueOperations = redisTemplate.opsForValue();
         //判断是否重复抢购, 更改为通过redis去取，由uid+goodsid确定同一用户不能抢购两单
-        SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + goods.getId());
-//        SeckillOrder seckillOrder =
-//                seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id",
-//                        user.getId()).eq("goods_id", goodsId));
-
+        SeckillOrder seckillOrder = (SeckillOrder) valueOperations.get("order:" + user.getId() + goodsId);
         if(seckillOrder != null){
             return RespBean.error(RespBeanEnum.REPETE_STOCK);
         }
 
+        //库存预减
+        //decrement:递减，原子型
+        Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
+        if(stock < 0){
+            //当为-1时让他为0，更好看
+            valueOperations.increment("seckillGoods:" + goodsId);
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
+
+
         Order order = orderService.seckill(user, goods);
         return RespBean.success(order);
+
     }
 
+    /*
+    系统初始化，把商品库存数量加载到redis
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        List<GoodsVo> list = goodsService.findGoodsVo();
+        if(CollectionUtils.isEmpty(list)){
+            return;
+        }
+        list.forEach(goodsVo -> redisTemplate.opsForValue().set("seckillGoods:" + goodsVo.getId(), goodsVo.getStockCount()));
+
+    }
 }
