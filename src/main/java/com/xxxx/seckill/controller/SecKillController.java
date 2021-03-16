@@ -104,6 +104,7 @@ public class SecKillController implements InitializingBean {
 
         //库存预减
         //decrement:递减，原子型
+        Object a = valueOperations.get("seckillGoods:"+goodsId);
         Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
         if(stock < 0){
             //当为-1时让他为0，更好看
@@ -132,5 +133,19 @@ public class SecKillController implements InitializingBean {
             EmptyStockMap.put(goodsVo.getId(), false);
         });
 
+    }
+
+    /*
+    秒杀结果查询
+     */
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    @ResponseBody
+    public RespBean result(User user, Long goodsId){
+        if(null == user){
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        Long orderId = seckillOrderService.getResult(user, goodsId);
+        return RespBean.success(orderId);
     }
 }

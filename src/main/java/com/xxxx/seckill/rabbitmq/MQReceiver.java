@@ -14,6 +14,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -83,13 +84,16 @@ public class MQReceiver {
         User user = message.getUser();
 
         //判断库存
+        ValueOperations valueOperations = redisTemplate.opsForValue();
         GoodsVo goodsVo = goodsService.findGoodsVoById(goodsId);
         if(goodsVo.getStockCount() < 1){
+            //redis内存储判断商品是否为空库存的标志，用来在用户查询秒杀结果时候用
+            valueOperations.set("isStockEmpty:" + goodsId, 0);
             return;
         }
 
         //通过redis判断是否重复抢购
-        SeckillOrder seckillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + goodsId);
+        SeckillOrder seckillOrder = (SeckillOrder) valueOperations.get("order:" + user.getId() + goodsId);
         if(seckillOrder != null){
             return ;
         }
