@@ -61,6 +61,9 @@ public class UserController {
         mqSender.directSend02("direct模式:green");
     }
 
+    /*
+    测试mq发送接收消息，topic模式
+     */
     @RequestMapping("/topicMQ/only")
     @ResponseBody
     public void directMQOnly(){
@@ -71,6 +74,21 @@ public class UserController {
     @ResponseBody
     public void directMQAll(){
         mqSender.topicSend02("大家都可以接收到的消息");
+    }
+
+    /*
+    测试mq发送接收消息，headers模式
+     */
+    @RequestMapping("/headersMQ/01")
+    @ResponseBody
+    public void headersMQ01(){
+        mqSender.headersSend01("queue01接收到的消息");
+    }
+
+    @RequestMapping("/headersMQ/02")
+    @ResponseBody
+    public void headersMQ02(){
+        mqSender.headersSend02("queue02接收到的消息");
     }
 
 }

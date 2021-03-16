@@ -1,6 +1,8 @@
 package com.xxxx.seckill.rabbitmq;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,24 @@ public class MQSender {
     public void topicSend02(Object msg){
         log.info("发送消息(QUEUE01和QUEUE02都可以接收)：" + msg);
         rabbitTemplate.convertAndSend("topicExchange", "ke.queue.red.message", msg);
+    }
+
+    public void headersSend01(String msg){
+        log.info("发送消息(QUEUE01和QUEUE02都可以接收)：" + msg);
+        MessageProperties properties = new MessageProperties();
+        properties.setHeader("color", "red");
+        properties.setHeader("speed", "fast");
+        Message message = new Message(msg.getBytes(), properties);
+        rabbitTemplate.convertAndSend("headersExchange", "", message);
+    }
+
+    public void headersSend02(String msg){
+        log.info("发送消息(QUEUE01接收)：" + msg);
+        MessageProperties properties = new MessageProperties();
+        properties.setHeader("color", "red");
+        properties.setHeader("speed", "normal");
+        Message message = new Message(msg.getBytes(), properties);
+        rabbitTemplate.convertAndSend("headersExchange", "", message);
     }
 
 

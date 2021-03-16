@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /*
-topic模式
+MQ配置类：topic模式
  */
 @Configuration
 public class RabbitMQConfigTopic {
