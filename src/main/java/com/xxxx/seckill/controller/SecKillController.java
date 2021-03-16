@@ -48,7 +48,8 @@ public class SecKillController implements InitializingBean {
     /*
     秒杀
     优化前： 1000 * 10  吞吐量QPS:2876
-    缓存QPS：1458
+    缓存QPS：3500
+    优化QPS:4486
      */
 
     @RequestMapping("/doSecKill2")
@@ -104,7 +105,6 @@ public class SecKillController implements InitializingBean {
 
         //库存预减
         //decrement:递减，原子型
-        Object a = valueOperations.get("seckillGoods:"+goodsId);
         Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
         if(stock < 0){
             //当为-1时让他为0，更好看
