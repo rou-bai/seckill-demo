@@ -29,6 +29,7 @@ public enum RespBeanEnum {
     SECKILL_FAILED(500503, "秒杀失败"),
     SECKILL_PATH_ERROR(500504, "秒杀路径错误"),
     CAPTCHA_ERROR(500505, "验证码错误"),
+    ACCESS_LIMIT_REAHCED(500506, "访问过于频繁，请稍后再试"),
     //订单模块5004x
     ORDER_NOT_EXISTS(500400, "订单不存在");
 
