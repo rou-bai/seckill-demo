@@ -2,6 +2,8 @@ package com.xxxx.seckill.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.wf.captcha.ArithmeticCaptcha;
+import com.xxxx.seckill.exception.GlobalException;
 import com.xxxx.seckill.pojo.Order;
 import com.xxxx.seckill.pojo.SeckillMessage;
 import com.xxxx.seckill.pojo.SeckillOrder;
@@ -15,6 +17,7 @@ import com.xxxx.seckill.utils.JsonUtil;
 import com.xxxx.seckill.vo.GoodsVo;
 import com.xxxx.seckill.vo.RespBean;
 import com.xxxx.seckill.vo.RespBeanEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,13 +28,17 @@ import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping("/seckill")
+@Slf4j
 public class SecKillController implements InitializingBean {
     @Autowired
     private IUserService userService;
@@ -175,5 +182,35 @@ public class SecKillController implements InitializingBean {
 
         String path = orderService.createPath(user, goodsId);
         return RespBean.success(path);
+    }
+
+    /*
+    获取验证码
+     */
+
+    @RequestMapping(value = "/captcha", method = RequestMethod.GET)
+    public void verifyCode(User user, Long goodsId, HttpServletResponse response){
+        if(null == user){
+            throw new GlobalException(RespBeanEnum.SESSION_ERROR);
+        }
+        if(goodsId < 0){
+            throw new GlobalException(RespBeanEnum.REQUEST_ILLEGAL);
+        }
+
+        //设置请求头为输出图片类型
+        response.setContentType("image/jpg");
+        response.setHeader("Pargam", "No-cache");
+        response.setHeader("Cache-Control", "no-cahce");
+        response.setDateHeader("Expires", 0);
+
+        //生成验证码，将结果放入redis
+        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 32, 3);
+        redisTemplate.opsForValue().set("captcha:" + user.getId() + goodsId, captcha.text(), 300, TimeUnit.SECONDS);
+        try{
+            //验证码以流形式输出
+            captcha.out(response.getOutputStream());
+        }catch (IOException e){
+            log.error("验证码生成失败:" + e.getMessage());
+        }
     }
 }
