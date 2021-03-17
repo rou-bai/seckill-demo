@@ -35,4 +35,9 @@ public interface IOrderService extends IService<Order> {
     秒杀路径确认
      */
     Boolean checkPath(String path, User user, long goodsId);
+
+    /*
+    验证码检查
+     */
+    Boolean checkCaptcha(User user, Long goodsId, String captcha);
 }
